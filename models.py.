@@ -1,77 +1,29 @@
-# models.py
-from datetime import datetime
-from sqlalchemy import (create_engine, Column, Integer, String, Text, DateTime, Boolean, Float, ForeignKey)
+from sqlalchemy import create_engine, Column, Integer, String, Text, DateTime
 from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy.orm import relationship, sessionmaker
+from sqlalchemy.orm import sessionmaker
+import os
+from datetime import datetime
 
-from config import DATABASE_URL
+# قاعدة البيانات
+DATABASE_URL = os.getenv("DATABASE_URL", "sqlite:///lastbot.db")
 
+engine = create_engine(DATABASE_URL, connect_args={"check_same_thread": False})
+SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 Base = declarative_base()
-engine = create_engine(DATABASE_URL, echo=False, future=True)
-SessionLocal = sessionmaker(bind=engine, autoflush=False, autocommit=False)
 
-class User(Base):
-    __tablename__ = 'users'
-    id = Column(Integer, primary_key=True)
-    username = Column(String(120), unique=True, nullable=False)
-    email = Column(String(200), nullable=True)
-    password_hash = Column(String(255))
-    is_admin = Column(Boolean, default=False)
-    created_at = Column(DateTime, default=datetime.utcnow)
+class Memory(Base):
+    __tablename__ = "memory"
+    id = Column(Integer, primary_key=True, index=True)
+    sender = Column(String(100))
+    role = Column(String(50))
+    message = Column(Text)
+    reply = Column(Text)
+    timestamp = Column(DateTime, default=datetime.utcnow)
 
-class Agent(Base):
-    __tablename__ = 'agents'
+class Knowledge(Base):
+    __tablename__ = "knowledge"
     id = Column(Integer, primary_key=True)
-    name = Column(String(120))
-    phone = Column(String(50))
-    region = Column(String(120))
-    active = Column(Boolean, default=True)
-    created_at = Column(DateTime, default=datetime.utcnow)
-
-class Order(Base):
-    __tablename__ = 'orders'
-    id = Column(Integer, primary_key=True)
-    external_id = Column(String(120), index=True, nullable=True)
-    customer_name = Column(String(200))
-    phone = Column(String(50))
-    address = Column(Text)
-    region = Column(String(120))
-    items = Column(Text)
-    status = Column(String(50), default='new')  # new, assigned, in_progress, delivered, closed
-    agent_id = Column(Integer, ForeignKey('agents.id'), nullable=True)
-    agent = relationship('Agent')
-    created_at = Column(DateTime, default=datetime.utcnow)
-    updated_at = Column(DateTime, default=datetime.utcnow)
-
-class KBArticle(Base):
-    __tablename__ = 'kb_articles'
-    id = Column(Integer, primary_key=True)
-    title = Column(String(300))
+    title = Column(String(255))
     content = Column(Text)
-    source = Column(String(200))
-    tags = Column(String(300))
-    created_at = Column(DateTime, default=datetime.utcnow)
-
-class PostRule(Base):
-    __tablename__ = 'post_rules'
-    id = Column(Integer, primary_key=True)
-    page_id = Column(String(80))
-    post_id = Column(String(120), nullable=True)
-    rule_name = Column(String(200))
-    action_type = Column(String(50))     # comment, reply_private, assign_agent
-    payload = Column(Text)
-    active = Column(Boolean, default=True)
-
-class MessageLog(Base):
-    __tablename__ = 'message_logs'
-    id = Column(Integer, primary_key=True)
-    platform = Column(String(50))   # facebook/whatsapp/internal
-    direction = Column(String(10))  # inbound/outbound
-    user_id = Column(Integer, nullable=True)
-    agent_id = Column(Integer, nullable=True)
-    content = Column(Text)
-    meta = Column(Text)
-    created_at = Column(DateTime, default=datetime.utcnow)
-
-def init_db():
-    Base.metadata.create_all(bind=engine)
+    source = Column(String(100))
+    tags = Column(String(255))
