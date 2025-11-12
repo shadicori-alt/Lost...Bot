@@ -1,0 +1,13 @@
+import os
+import telebot
+from dotenv import load_dotenv
+
+load_dotenv()
+TOKEN = os.getenv('BOT_TOKEN')
+bot = telebot.TeleBot(TOKEN)
+
+@bot.message_handler(commands=['start'])
+def send_welcome(message):
+    bot.reply_to(message, "أهلاً! البوت يعمل ✅")
+    
+bot.polling()
