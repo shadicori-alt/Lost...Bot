@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>لوحة تحكم LastBot</title>
+  <style>
+    :root {
+      --bg: #f8f9fa;
+      --text: #222;
+      --primary: #007bff;
+      --secondary: #6c757d;
+      --card: #ffffff;
+    }
+
+    body.dark {
+      --bg: #1e1e2f;
+      --text: #f5f5f5;
+      --primary: #0d6efd;
+      --secondary: #aaa;
+      --card: #2b2b3c;
+    }
+
+    body {
+      background-color: var(--bg);
+      color: var(--text);
+      margin: 0;
+      font-family: 'Cairo', sans-serif;
+      transition: background 0.3s, color 0.3s;
+    }
+
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 15px 20px;
+      background-color: var(--card);
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    }
+
+    header h1 {
+      font-size: 1.4rem;
+      color: var(--primary);
+    }
+
+    .toggle-theme {
+      background: var(--primary);
+      border: none;
+      color: white;
+      padding: 8px 15px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 0.9rem;
+    }
+
+    .container {
+      display: flex;
+      min-height: calc(100vh - 60px);
+    }
+
+    aside {
+      width: 250px;
+      background-color: var(--card);
+      border-left: 1px solid #ddd;
+      padding: 20px 0;
+      transition: width 0.3s;
+    }
+
+    aside ul {
+      list-style: none;
+      padding: 0;
+    }
+
+    aside li {
+      padding: 12px 20px;
+      cursor: pointer;
+      font-weight: 500;
+      color: var(--text);
+      transition: background 0.2s;
+    }
+
+    aside li:hover {
+      background: var(--primary);
+      color: white;
+    }
+
+    main {
+      flex: 1;
+      padding: 20px;
+      overflow-y: auto;
+    }
+
+    .card {
+      background: var(--card);
+      padding: 20px;
+      border-radius: 8px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+      margin-bottom: 20px;
+    }
+
+    .chat-widget {
+      position: fixed;
+      bottom: 25px;
+      left: 25px;
+      width: 320px;
+      max-height: 450px;
+      background: var(--card);
+      box-shadow: 0 3px 12px rgba(0,0,0,0.3);
+      border-radius: 10px;
+      overflow: hidden;
+      display: none;
+      flex-direction: column;
+      transition: all 0.3s;
+    }
+
+    .chat-widget header {
+      background: var(--primary);
+      color: white;
+      font-weight: bold;
+      text-align: center;
+      padding: 10px;
+    }
+
+    .chat-widget .messages {
+      flex: 1;
+      overflow-y: auto;
+      padding: 10px;
+    }
+
+    .chat-widget input {
+      border: none;
+      padding: 10px;
+      width: calc(100% - 20px);
+      border-top: 1px solid #ccc;
+    }
+
+    .chat-button {
+      position: fixed;
+      bottom: 25px;
+      left: 25px;
+      background: var(--primary);
+      color: white;
+      border: none;
+      padding: 15px;
+      border-radius: 50%;
+      font-size: 1.3rem;
+      cursor: pointer;
+      box-shadow: 0 3px 10px rgba(0,0,0,0.3);
+    }
+
+    @media (max-width: 768px) {
+      aside {
+        width: 200px;
+      }
+      .chat-widget {
+        width: 90%;
+        left: 5%;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>لوحة تحكم LastBot</h1>
+    <button class="toggle-theme" onclick="toggleTheme()">تبديل النمط</button>
+  </header>
+
+  <div class="container">
+    <aside>
+      <ul>
+        <li onclick="showSection('dashboard')">📊 الرئيسية</li>
+        <li onclick="showSection('orders')">🛍️ الطلبات</li>
+        <li onclick="showSection('delegates')">🚚 المناديب</li>
+        <li onclick="showSection('messenger')">💬 رسائل الماسنجر</li>
+        <li onclick="showSection('whatsapp')">📱 رسائل واتساب</li>
+        <li onclick="showSection('bot')">🤖 إعدادات البوت</li>
+        <li onclick="showSection('knowledge')">📘 مكتبة المعرفة</li>
+        <li onclick="showSection('reports')">📈 التقارير</li>
+      </ul>
+    </aside>
+
+    <main id="content">
+      <div id="dashboard" class="card">مرحباً بك في لوحة تحكم النظام الذكي LastBot 🚀</div>
+      <div id="orders" class="card" style="display:none;">قسم الطلبات قيد التحميل...</div>
+      <div id="delegates" class="card" style="display:none;">قسم إدارة المناديب...</div>
+      <div id="messenger" class="card" style="display:none;">تحكم برسائل ماسنجر والردود التلقائية...</div>
+      <div id="whatsapp" class="card" style="display:none;">قسم واتساب وإدارة المحادثات...</div>
+      <div id="bot" class="card" style="display:none;">إعدادات البوت الذكي والمساعد الشخصي...</div>
+      <div id="knowledge" class="card" style="display:none;">مكتبة المعرفة وتدريب البوت...</div>
+      <div id="reports" class="card" style="display:none;">التقارير اليومية والإحصائيات...</div>
+    </main>
+  </div>
+
+  <!-- زر المساعد الذكي -->
+  <button class="chat-button" onclick="toggleChat()">💡</button>
+
+  <!-- نافذة المساعد الذكي -->
+  <div class="chat-widget" id="chatWidget">
+    <header>المساعد الذكي</header>
+    <div class="messages" id="chatMessages"></div>
+    <input type="text" id="chatInput" placeholder="اكتب سؤالك..." onkeydown="if(event.key==='Enter')sendMessage()">
+  </div>
+
+  <script>
+    function toggleTheme() {
+      document.body.classList.toggle('dark');
+    }
+
+    function showSection(id) {
+      document.querySelectorAll('main .card').forEach(sec => sec.style.display = 'none');
+      document.getElementById(id).style.display = 'block';
+    }
+
+    function toggleChat() {
+      const chat = document.getElementById('chatWidget');
+      chat.style.display = chat.style.display === 'flex' ? 'none' : 'flex';
+    }
+
+    function sendMessage() {
+      const input = document.getElementById('chatInput');
+      const messages = document.getElementById('chatMessages');
+      const text = input.value.trim();
+      if (!text) return;
+      const msg = document.createElement('div');
+      msg.textContent = "👤 أنت: " + text;
+      messages.appendChild(msg);
+      input.value = '';
+      // رد مؤقت لحين الربط الفعلي بالذكاء الصناعي
+      setTimeout(() => {
+        const reply = document.createElement('div');
+        reply.textContent = "🤖 المساعد: جاري تحليل سؤالك...";
+        messages.appendChild(reply);
+        messages.scrollTop = messages.scrollHeight;
+      }, 500);
+    }
+  </script>
+</body>
+</html>
